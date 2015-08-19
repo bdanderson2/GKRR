@@ -138,3 +138,4 @@ def FullImport(s='t'):
     else:
         data,labels = importData(input("Input Training Data File Name:\n"))
     return getX(data), getY(data), labels
+

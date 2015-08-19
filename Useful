@@ -112,3 +112,4 @@ def findin(a,tar):
         print("Must pass iterable object")
         return a
     return -1, -1
+

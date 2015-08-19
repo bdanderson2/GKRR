@@ -1,0 +1,114 @@
+import time,math,threading
+import matplotlib.pyplot as plt
+import numpy as np
+
+def getNumInRange(a,b,s="Please input a number: "):
+    if a > b:
+        temp = a
+        a = b
+        b = temp
+    x = -1
+    while x == -1:
+        try:
+            x = float(input(s))
+            if x < a or x > b:
+                print("x must be between",a,"and",b)
+                x = -1
+                
+        except:
+            print("Input must be a number!")
+            x = -1
+    return x
+
+def isFloat(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+def getMaxMagn(things):
+    if max(things) > abs(min(things)):
+        return max(things)
+    else:
+        return abs(min(things))
+
+def containsNumbers(string):
+    return any(char.isdigit() for char in string)
+
+def printTimeElapsed(t0,FINISHED=False):
+    if time.time()-t0 > 1 and FINISHED == False:
+        timeformatting(time.time() - t0,0)
+    t = threading.Timer(300, printTimeElapsed,[t0])
+    t.daemon = True
+    t.start()
+    if FINISHED == True:
+        t.cancel()
+    return
+
+def timeformatting(telapsed,c):
+    timesplit = [0,0,0,0]
+    if telapsed >= 86400:
+        timesplit[0] = math.floor(telapsed/86400)
+        telapsed = telapsed % 86400
+    if telapsed >= 3600:
+        timesplit[1] = math.floor(telapsed/3600)
+        telapsed = telapsed %3600        
+    if telapsed >= 60:
+        timesplit[2] = math.floor(telapsed/60)
+        telapsed = telapsed % 60 
+    timesplit[3] = telapsed
+    if c != 1:
+        print("Uptime: ", end="")
+        print(str(timesplit[0])+":"+str(timesplit[1])+":"+
+          str(timesplit[2])+":"+str(math.floor(timesplit[3]))) 
+    if c == 1:
+        print(str(timesplit[0])+":"+str(timesplit[1])+":"+
+          str(timesplit[2])+":"+str(round(timesplit[3],3))+" passed")
+    return
+
+def absmax(a):
+    try:
+        maxVal = min(a[0])
+        l = len(a)
+        for n in range(l):
+            try:
+                temp = max(a[n])
+            except ValueError:
+                temp = maxVal
+            if temp > maxVal:
+                maxVal = temp
+    except TypeError:
+        print("Must pass 2D iterable object")
+        return a
+    return maxVal
+
+
+def absmin(a):
+    try:
+        minVal = max(a[0])
+        l = len(a)
+        for n in range(l):
+            try:
+                temp = min(a[n])
+            except ValueError:
+                temp = minVal
+            if temp < minVal:
+                minVal = temp
+    except TypeError:
+        print("Must pass 2D iterable object")
+        return a
+    return minVal
+
+def findin(a,tar):
+    try:
+        l = len(a)
+        for n in range(l):
+            k = len(a[n])
+            for m in range(k):
+                if a[n][m] == tar:
+                    return n, m
+    except TypeError:
+        print("Must pass iterable object")
+        return a
+    return -1, -1

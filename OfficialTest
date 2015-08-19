@@ -1,0 +1,69 @@
+import FitDataImport as imp
+import FitFinder as fit
+import FitTester as tests
+import FitPlotter as plot
+import matplotlib.pyplot as plt
+import numpy as np
+from math import *
+
+def OfficialTest(I=50,npts=10, s=1):
+    X,Y,label = imp.FullImport(s)
+    AllMse = []
+    AllXt = []
+    AllYt = []
+    AllXT = []
+    AllYT = []
+    maxError = []
+
+    for n in range(I):
+        Xt,XT,Yt,YT = cross_validation.train_test_split(X, Y, test_size = 0.2)
+        regr = fit.setBestParameters(len(Xt),0,npts)
+        if int(n+1)%10 == 0:
+            print("iteration "+str(n+1)+"/"+str(I))
+        regr.fit(Xt,Yt)
+        YTP = regr.predict(XT)
+        rms = sqrt(mean_squared_error(YT,YTP))
+        _,_,ymax,_ = tests.GetErrorInY(YT,YTP,0)
+        AllMse.append(rms)
+        AllXt.append(Xt)
+        AllYt.append(Yt)
+        AllXT.append(XT)
+        AllYT.append(YT)
+        maxError.append(ymax)
+
+    MMSE = max(AllMse)
+    m = AllMse.index(MMSE)
+    regr = fit.setBestParameters(len(Xt),0,npts)
+    Mregr,_,_ = fit.createModelAllData(regr,AllXt[m],AllYt[m])
+    print("\nThe maximum RMS is      ", MMSE)
+    MYP, MYtp, MYTP = tests.GetAllPredictions(X,AllXt[m],AllXT[m],Mregr)
+    tests.GetErrorInY(Y,MYP)
+    print("The alpha parameter is ",str(float(Mregr.best_params_['alpha'])))
+    print("The gamma parameter is ",str(float(Mregr.best_params_['gamma'])))    
+
+    nMSE = min(AllMse)
+    n = AllMse.index(nMSE)
+    regr = fit.setBestParameters(len(Xt),0,npts)
+    nregr,_,_ = fit.createModelAllData(regr,AllXt[n],AllYt[n])
+    print("\nThe minimum RMS is      ", nMSE)
+    nYP, nYtp, nYTP = tests.GetAllPredictions(X,AllXt[n],AllXT[n],nregr)
+    tests.GetErrorInY(Y,nYP)
+    print("The alpha parameter is ",str(float(nregr.best_params_['alpha'])))
+    print("The gamma parameter is ",str(float(nregr.best_params_['gamma'])))
+
+    print("\nThe average RMS:        ",np.mean(AllMse))
+    AME = np.mean(maxError)
+    print("The average max error:  ",AME)
+    MME = max(maxError)
+    print("The maximum error:      ",str(float(MME)))
+
+    fig = plt.figure()
+    plot.simplemultiDPlot(Y,AllYt[m],MYtp,AllYT[m],MYTP,2,3,1,2,3)
+    plot.simplemultiDPlot(Y,AllYt[n],nYtp,AllYT[n],nYTP,2,3,4,5,6)
+
+    ax = fig.add_axes([0,0,1,1])
+    plt.text(0.07, 0.725, "Worst Fit", ha='center', va='center',
+             rotation = 'vertical', size = 18,transform=ax.transAxes)
+    plt.text(0.07, 0.275, "Best Fit", ha='center', va='center',
+             rotation = 'vertical', size = 18, transform=ax.transAxes)
+    ax.set_axis_off()

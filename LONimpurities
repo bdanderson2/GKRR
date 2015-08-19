@@ -1,0 +1,61 @@
+import FitDataImport as imp
+import FitFinder as fit
+import FitPlotter as plot
+import numpy as np
+
+def ImpurityLON(n,r):
+    lo = ['Al','Cu','Ni','Pd','Pt']
+    testel = 5
+    testn = n
+    reps = r
+    allrms = []
+    X,Y,label = imp.FullImport(1)
+    for n in range(testn):
+        loNrms = []
+        for m in range(testel):
+            host = lo[m]
+            for o in range(reps):
+                Xt,XT,Yt,YT,loindex = fit.LONHostElements(host,X,Y,label,n)
+                loNrms.append(fit.FitGKRR(Xt,XT,Yt,YT))
+        allrms.append(loNrms)
+        print("completed ",n+1,"/",testn)
+    allaverms = []
+    alaverms = []
+    cuaverms = []
+    niaverms = []
+    pdaverms = []
+    ptaverms = []
+    for n in range(len(allrms)):
+        allaverms.append(round(np.mean(allrms[n]),3))
+        alaverms.append(np.mean(allrms[n][0:reps]))
+        cuaverms.append(np.mean(allrms[n][reps:2*reps]))
+        niaverms.append(np.mean(allrms[n][2*reps:3*reps]))
+        pdaverms.append(np.mean(allrms[n][3*reps:4*reps]))
+        ptaverms.append(np.mean(allrms[n][4*reps:5*reps]))
+    x = np.arange(0,testn,1)
+    plot.SetRowColumn(1,1)
+    plot.LON(x,allaverms,alaverms,cuaverms,niaverms,pdaverms,ptaverms)
+    plot.setAxes(x,list([max(allaverms),min(allaverms)]),"Average RMS vs Impurities Trained On",
+            "Number Of Impurities Trained on","RMS")
+    print()
+    print("Tested Elements: ",testel,
+          "\nNumber of Impurities Included: ",testn-1,
+          "\nIterations per number included per element: ",reps)
+    print("\nAvg")
+    for n in range(len(allaverms)):
+        print(allaverms[n])
+    print("\nAl")
+    for n in range(len(allaverms)):
+        print(alaverms[n])
+    print("\nCu")
+    for n in range(len(allaverms)):
+        print(cuaverms[n])
+    print("\nNi")
+    for n in range(len(allaverms)):
+        print(niaverms[n])
+    print("\nPd")
+    for n in range(len(allaverms)):
+        print(pdaverms[n])
+    print("\nPt")
+    for n in range(len(allaverms)):
+        print(ptaverms[n])

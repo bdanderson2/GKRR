@@ -1,0 +1,100 @@
+
+import FitTester as tests
+
+from math import *
+from sklearn.kernel_ridge import KernelRidge
+from sklearn.grid_search import GridSearchCV
+from sklearn import cross_validation
+from sklearn.metrics import mean_squared_error
+from sklearn import metrics
+from sklearn.cross_validation import train_test_split
+
+GSFOLDS = 3
+FOLDS = 5
+NPTS = 20
+
+def createModelAllData(regr,X,Y):
+    regr.fit(X,Y)
+    YP = tests.GetPrediction(X,regr)
+    rms = tests.GetRMSE(Y,YP)
+    return regr,YP,rms
+
+def FitGKRR(Xt,XT,Yt,YT):
+    regr = setBestParameters(len(Xt))
+    regr.fit(Xt,Yt)
+    return tests.GetRMSE(YT,tests.GetPrediction(XT,regr))
+
+def LOHostElement(lo,X,Y,label):
+    loindex = []
+    count = 0
+    for n in range(len(label[1])):
+        if label[1][n][0] == lo:
+            loindex.append(n)
+            count += 1
+    if count == 0:
+        print("Element Not Found")
+        sys.exit()
+    XT = np.array((X[loindex]))
+    YT = np.array((Y[loindex]))
+    Xtemp = []
+    Ytemp = []
+    for n in range(len(X)):
+            if loindex.count(n) != 1:
+                  Xtemp.append(X[n])
+                  Ytemp.append(Y[n])
+    Xt = np.array([[float(0) for n in range(len(X[0]))]
+                   for n in range(len(X) - len(loindex))])
+    Yt = np.array([[float(0) for n in range(1)]
+                   for n in range(len(Y) - len(loindex))])
+    for m in range(len(Xtemp)):
+        Yt[m] = Ytemp[m]
+        for n in range(len(Xtemp[0])):
+            Xt[m][n] = Xtemp[m][n]
+    return Xt,XT,Yt,YT
+
+def LONHostElements(lo,X,Y,label,q):
+    loindex = []
+    lolabel = []
+    Itlabel = []
+    retelements = []
+    count = 0
+    found = len(label[1])
+    for n in range(len(label[1])):
+        if label[1][n][0] == lo:
+            loindex.append(n)
+            lolabel.append(label[1][n][1])
+            count += 1
+            if n < found:
+                found = n
+    if count == 0:
+        print("Element Not Found")
+        sys.exit()
+    for n in range(q):
+        ret = random.randint(0,len(loindex)-1)
+        loindex.pop(ret)
+        l = lolabel.pop(ret)
+        Itlabel.append(l)
+    XT = np.array((X[loindex]))
+    YT = np.array((Y[loindex]))
+    Xtemp = []
+    Ytemp = []
+    for n in range(len(X)):
+            if loindex.count(n) != 1:
+                  Xtemp.append(X[n])
+                  Ytemp.append(Y[n])
+    Xt = np.array([[float(0) for n in range(len(X[0]))]
+                   for n in range(len(X) - len(loindex))])
+    Yt = np.array([[float(0) for n in range(1)]
+                   for n in range(len(Y) - len(loindex))])
+    for m in range(len(Xtemp)):
+        Yt[m] = Ytemp[m]
+        for n in range(len(Xtemp[0])):
+            Xt[m][n] = Xtemp[m][n]
+    return Xt,XT,Yt,YT,lolabel,Itlabel,found
+    
+    def setBestParameters(L,ker=0,npts=NPTS,f=GSFOLDS):
+    if f > L:
+        f = L-2
+    return GridSearchCV(KernelRidge(kernel='rbf'), cv=f,
+                          param_grid={"alpha": np.logspace(-6,3,npts),
+                                      "gamma": np.logspace(-10,0,npts)})

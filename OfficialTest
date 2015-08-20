@@ -1,10 +1,14 @@
-import FitDataImport as imp
+import FitImport as imp
 import FitFinder as fit
 import FitTester as tests
 import FitPlotter as plot
 import matplotlib.pyplot as plt
 import numpy as np
 from math import *
+from sklearn import cross_validation
+from sklearn.cross_validation import train_test_split
+from sklearn import metrics
+from sklearn.metrics import mean_squared_error
 
 def OfficialTest(I=50,npts=10, s=1):
     X,Y,label = imp.FullImport(s)
@@ -67,3 +71,4 @@ def OfficialTest(I=50,npts=10, s=1):
     plt.text(0.07, 0.275, "Best Fit", ha='center', va='center',
              rotation = 'vertical', size = 18, transform=ax.transAxes)
     ax.set_axis_off()
+    plt.show()

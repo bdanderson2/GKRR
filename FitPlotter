@@ -28,6 +28,28 @@ def errorPlot(Y,Yp,dt = 0,n=1,s="Y calculated vs Y actual",
     pylab.xlim(xmin= truemin-0.1*abs(truemin), xmax = 1.1 * truemax)
     pylab.ylim(ymin= truemin-0.1*abs(truemin), ymax = 1.1 * truemax)
     return
+
+def errorPlotCombined(Y1,Yp1,Y2,Yp2, n=1,s="Y calculated vs Y actual",
+              xl='Actual Values',yl="Calclulated Values",legend = True):
+    truemin = min(min(min(Y1),min(Yp1)),min(min(Y2),min(Yp2)))
+    truemax = max(max(max(Y1),max(Yp1)),max(max(Y2),max(Yp2)))
+    if truemin < 0: T = np.linspace(1.1*truemin,1.1*truemax)
+    else:        T = np.linspace(truemin-1.1*truemin,1.1*truemax)
+    
+    
+    plt.subplot(FIGROW,FIGCOL,n)
+
+    plt.plot(Y1,Yp1,'og',label = "Train Data")
+    plt.plot(Y2,Yp2,'or',label = "Test Data")
+
+    plt.plot(T,T,'-',color='b', label = "± 0 units")
+    plt.plot(T,T+error,'--b', label = "± "+str(error)+" unit")
+    plt.plot(T,T-error,'--b')
+    setAxes([min(Y1),min(Y2)],[min(Yp1),min(Yp2)],s,xl,yl,legend)
+    pylab.xlim(xmin= truemin-0.1*truemin, xmax = 1.1 * truemax)
+    pylab.ylim(ymin= truemin-0.1*truemin, ymax = 1.1 * truemax)
+    plt.grid()
+    return
     
 def LON(x,ave,al,cu,ni,pd,pt):
     M = []

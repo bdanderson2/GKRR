@@ -1,0 +1,27 @@
+import numpy as np
+from math import *
+from sklearn.metrics import mean_squared_error
+
+def GetAllPredictions(X,Xt,XT,regr):
+    return GetPrediction(X,regr), GetPrediction(Xt,regr), GetPrediction(XT,regr)
+
+def GetErrorInY(Y,YP,p=1):
+    Yer = Y-YP
+    Yme = np.mean(abs(Yer))
+    Yma = max(abs(Yer))
+    Ymi = min(abs(Yer))
+    if p == 1:
+        print("The mean error in Y:    ",Yme)
+        print("The max error in Y:     ",str(float(Yma)))
+        print("The min error in Y:     ",str(float(Ymi)))
+    return Yer, Yme, Yma, Ymi
+
+def GetPrediction(X,regr):
+    return regr.predict(X)
+
+def GetRMSE(Y,YP):
+    return sqrt(mean_squared_error(Y,YP))
+
+def PrintParameters(regr):
+    print("The alpha parameter is ",str(float(regr.best_params_['alpha'])))
+    print("The gamma parameter is ",str(float(regr.best_params_['gamma'])))

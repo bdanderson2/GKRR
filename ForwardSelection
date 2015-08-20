@@ -1,0 +1,51 @@
+import FitDataImport as imp
+import FitFinder as fit
+import numpy as np
+
+
+def FWDescrSearch(i = 50):
+    X,Y,L = imp.FullImport(1)
+    T = len(X[0])
+    BestDesc = []
+    step = 1
+    newRMS = 1
+    oldRMS = 10
+    while newRMS < oldRMS:                  #continue until make worse
+        TestRMS = []
+        for z in range(T):                  #Test Each descriptor
+            print("\nTesting Descr ",z,"",L[0][z])
+            TestSet = []
+            setRMS = []
+            for n in range(len(BestDesc)):  #Add already known bests
+                desc,_ = fit.GODesc(X,BestDesc[n])
+                TestSet.append(desc)
+            
+            tryfit = True
+            for n in range(step):           #add one new descriptor
+                if BestDesc.count(z) == 0:
+                    desc,_ = fit.GODesc(X,z)
+                    TestSet.append(desc)
+                else: tryfit = False
+            if tryfit == True:              #Test if new descriptor
+                TestSet = np.swapaxes(TestSet,0,1)
+                for n in range(i):
+                    rms = fit.SplitFitGKRR(TestSet,Y,0.2)
+                    setRMS.append(rms)
+                TestRMS.append(np.mean(setRMS))
+                print("Descr ",z,"",L[0][z]+" has rms",np.mean(setRMS))
+            else:                           #Skip if old descriptor
+                TestRMS.append(10)
+                print("Descr ",z,"",L[0][z]+" skipped!")
+        mi = min(TestRMS)
+        t = TestRMS.index(mi)
+        BestDesc.append(t)
+        print("Desc",t,"("+str(L[0][t])+
+              ") added to list of Best Descriptors\n\n")
+        oldRMS = newRMS
+        newRMS = mi
+    print("Best Descs are:")
+    for n in range(len(BestDesc)-1):
+        print(L[0][BestDesc[n]])
+        
+
+FWDescrSearch(20)

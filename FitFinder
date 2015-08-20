@@ -1,4 +1,6 @@
 import FitTester as tests
+import numpy as np
+import random
 
 from math import *
 from sklearn.kernel_ridge import KernelRidge
@@ -87,7 +89,7 @@ def LONHostElements(lo,X,Y,label,q):
             Xt[m][n] = Xtemp[m][n]
     return Xt,XT,Yt,YT,lolabel,Itlabel,found
     
-    def setBestParameters(L,ker=0,npts=NPTS,f=GSFOLDS):
+def setBestParameters(L,ker=0,npts=NPTS,f=GSFOLDS):
     if f > L:
         f = L-2
     return GridSearchCV(KernelRidge(kernel='rbf'), cv=f,

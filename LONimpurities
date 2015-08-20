@@ -1,7 +1,8 @@
-import FitDataImport as imp
+import FitImport as imp
 import FitFinder as fit
 import FitPlotter as plot
 import numpy as np
+import matplotlib.pyplot as plt
 
 def ImpurityLON(n,r):
     lo = ['Al','Cu','Ni','Pd','Pt']
@@ -15,7 +16,7 @@ def ImpurityLON(n,r):
         for m in range(testel):
             host = lo[m]
             for o in range(reps):
-                Xt,XT,Yt,YT,loindex = fit.LONHostElements(host,X,Y,label,n)
+                Xt,XT,Yt,YT,_,_,_ = fit.LONHostElements(host,X,Y,label,n)
                 loNrms.append(fit.FitGKRR(Xt,XT,Yt,YT))
         allrms.append(loNrms)
         print("completed ",n+1,"/",testn)
@@ -59,3 +60,4 @@ def ImpurityLON(n,r):
     print("\nPt")
     for n in range(len(allaverms)):
         print(ptaverms[n])
+    plt.show()

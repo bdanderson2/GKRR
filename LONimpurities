@@ -11,6 +11,7 @@ def ImpurityLON(n,r):
     reps = r
     allrms = []
     X,Y,label = imp.FullImport(1)
+    X = fit.normalizeData(X)
     for n in range(testn):
         loNrms = []
         for m in range(testel):

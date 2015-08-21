@@ -1,4 +1,4 @@
-import FitDataImport as imp
+import FitImport as imp
 import FitFinder as fit
 import FitTester as tests
 import FitPlotter as plot
@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 
 def LeaveOutSingleImport():
     X,Y,label = imp.FullImport(1)
+    X = fit.normalizeData(X)
     lo = input("Input symbol for the element you would like to leave out")
 ##    lo_Options = ['Al','Au','Ni','Cu','Ir','Pb','Pd','Pt']
-    Xt,XT,Yt,YT = fit.LOHostElement(lo,X,Y,label)   
+    Xt,XT,Yt,YT,_,_,_ = fit.LOHostElement(lo,X,Y,label,0)   
     regr = fit.setBestParameters(len(Xt))
     regr,YP,rms = fit.createModelAllData(regr,Xt,Yt)
     YP,Ytp,YTP = tests.GetAllPredictions(Xt,Xt,XT,regr)
@@ -20,3 +21,6 @@ def LeaveOutSingleImport():
                    s="Y calculated vs Y actual (Leave Out "+str(lo)+")",
               xl='Actual Values',yl="Calclulated Values",legend = True)
     plt.show()
+
+if __name__ == '__main__':
+    LeaveOutSingleImport()

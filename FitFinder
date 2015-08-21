@@ -21,34 +21,6 @@ def FitGKRR(Xt,XT,Yt,YT):
     regr.fit(Xt,Yt)
     return tests.GetRMSE(YT,tests.GetPrediction(XT,regr))
 
-def LOHostElement(lo,X,Y,label):
-    loindex = []
-    count = 0
-    for n in range(len(label[1])):
-        if label[1][n][0] == lo:
-            loindex.append(n)
-            count += 1
-    if count == 0:
-        print("Element Not Found")
-        sys.exit()
-    XT = np.array((X[loindex]))
-    YT = np.array((Y[loindex]))
-    Xtemp = []
-    Ytemp = []
-    for n in range(len(X)):
-            if loindex.count(n) != 1:
-                  Xtemp.append(X[n])
-                  Ytemp.append(Y[n])
-    Xt = np.array([[float(0) for n in range(len(X[0]))]
-                   for n in range(len(X) - len(loindex))])
-    Yt = np.array([[float(0) for n in range(1)]
-                   for n in range(len(Y) - len(loindex))])
-    for m in range(len(Xtemp)):
-        Yt[m] = Ytemp[m]
-        for n in range(len(Xtemp[0])):
-            Xt[m][n] = Xtemp[m][n]
-    return Xt,XT,Yt,YT
-
 def LONHostElements(lo,X,Y,label,q):
     loindex = []
     lolabel = []
@@ -88,6 +60,15 @@ def LONHostElements(lo,X,Y,label,q):
         for n in range(len(Xtemp[0])):
             Xt[m][n] = Xtemp[m][n]
     return Xt,XT,Yt,YT,lolabel,Itlabel,found
+
+def normalizeData(X):
+    for m in range(len(X[0])):
+        ma = max(abs(X[:,m]))
+        if ma == 0:
+            ma = 1
+        for n in range(len(X)):
+            X[n][m] = (X[n][m])/ma
+    return X
     
 def setBestParameters(L,ker=0,npts=NPTS,f=GSFOLDS):
     if f > L:

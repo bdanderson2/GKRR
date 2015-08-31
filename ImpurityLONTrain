@@ -1,0 +1,71 @@
+import FitImport as imp
+import FitFinder as fit
+import FitTester as tests
+import FitPlotter as plot
+
+import numpy as np
+
+def ImpurityLONTrain(a,b):
+    lo = ['Al','Cu','Ni','Pd','Pt']
+    testel = 5
+    testn = a+1
+    reps = b
+    allrms = []
+    X,Y,label = imp.FullImport()
+    X = fit.normalizeData(X)
+    for n in range(1,testn):
+        loNrms = []
+        for m in range(testel):
+            host = lo[m]
+            for o in range(reps):
+##                print("returning",n,"impuritie(s)     testing",host,"     rep #",o+1,"/",reps)
+                Xt,XT,Yt,YT,lolabel,Itlabel,f = fit.LONHostElements(host,X,Y,label,n)
+                regr = fit.setBestParameters(len(Xt))
+                regr.fit(Xt,Yt)
+                YtP = tests.GetPrediction(Xt,regr)
+                trainRMS = []
+                for z in range(n):
+                    trainRMS.append(tests.GetRMSE(Yt[f+z],YtP[f+z]))
+                loNrms.append(np.mean(trainRMS))
+        allrms.append(loNrms)
+        print("completed ",n,"/",testn-1)
+    allaverms = []
+    alaverms = []
+    cuaverms = []
+    niaverms = []
+    pdaverms = []
+    ptaverms = []
+    for n in range(len(allrms)):
+        allaverms.append(round(np.mean(allrms[n]),3))
+        alaverms.append(np.mean(allrms[n][0:reps]))
+        cuaverms.append(np.mean(allrms[n][reps:2*reps]))
+        niaverms.append(np.mean(allrms[n][2*reps:3*reps]))
+        pdaverms.append(np.mean(allrms[n][3*reps:4*reps]))
+        ptaverms.append(np.mean(allrms[n][4*reps:5*reps]))
+    x = np.arange(1,testn,1)
+    plot.SetRowColumn(1,1)
+    plot.LON(x,allaverms,alaverms,cuaverms,niaverms,pdaverms,ptaverms)
+    plot.setAxes(x,list([max(allaverms),min(allaverms)]),"Average RMS (training) vs Impurities Trained On",
+            "Number Of Impurities Trained on","RMS")
+    print()
+    print("Tested Elements: ",testel,
+          "\nNumber of Impurities Included: ",testn-1,
+          "\nIterations per number included per element: ",reps)
+    print("\nAvg")
+    for n in range(len(allaverms)):
+        print(allaverms[n])
+    print("\nAl")
+    for n in range(len(allaverms)):
+        print(alaverms[n])
+    print("\nCu")
+    for n in range(len(allaverms)):
+        print(cuaverms[n])
+    print("\nNi")
+    for n in range(len(allaverms)):
+        print(niaverms[n])
+    print("\nPd")
+    for n in range(len(allaverms)):
+        print(pdaverms[n])
+    print("\nPt")
+    for n in range(len(allaverms)):
+        print(ptaverms[n])

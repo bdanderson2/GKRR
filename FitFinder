@@ -5,6 +5,8 @@ import random
 from math import *
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.grid_search import GridSearchCV
+from sklearn import cross_validation
+from sklearn.cross_validation import train_test_split
 
 GSFOLDS = 3
 FOLDS = 5
@@ -20,6 +22,23 @@ def FitGKRR(Xt,XT,Yt,YT):
     regr = setBestParameters(len(Xt))
     regr.fit(Xt,Yt)
     return tests.GetRMSE(YT,tests.GetPrediction(XT,regr))
+
+def GODesc(X,n,label=None):
+    if label != None:
+        L = label[0][n]
+    else:
+        L = "None"
+    X = X[:,n]    
+    return list(X),L
+
+
+def LODesc(X,n,label=None):
+    if label != None:
+        L = label[0][n]
+    else:
+        L = "None"
+    X = np.delete(X,n,1)
+    return X,L
 
 def LONHostElements(lo,X,Y,label,q):
     loindex = []
@@ -63,6 +82,15 @@ def LONHostElements(lo,X,Y,label,q):
 
 def normalizeData(X):
     for m in range(len(X[0])):
+        ma = max(X[:,m])
+        mi = min(X[:,m])
+        for n in range(len(X)):
+            if ma != mi: X[n][m] = ((X[n][m] - mi)/(ma-mi))
+            else: X[n][m] = 0.5
+    return X
+
+def ScaleData(X):
+    for m in range(len(X[0])):
         ma = max(abs(X[:,m]))
         if ma == 0:
             ma = 1
@@ -76,3 +104,10 @@ def setBestParameters(L,ker=0,npts=NPTS,f=GSFOLDS):
     return GridSearchCV(KernelRidge(kernel='rbf'), cv=f,
                           param_grid={"alpha": np.logspace(-6,3,npts),
                                       "gamma": np.logspace(-10,0,npts)})
+
+def SplitFitGKRR(X,Y,n):
+    Xt,XT,Yt,YT = cross_validation.train_test_split(X, Y, test_size = n)
+    regr = setBestParameters(len(Xt))
+    regr.fit(Xt,Yt)
+    return tests.GetRMSE(YT,tests.GetPrediction(XT,regr))
+    

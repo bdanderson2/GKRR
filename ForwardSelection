@@ -29,7 +29,7 @@ def FWDescrSearch(i = 50):
             if tryfit == True:              #Test if new descriptor
                 TestSet = np.swapaxes(TestSet,0,1)
                 for n in range(i):
-                    rms = fit.SplitFitGKRR(TestSet,Y,0.2)
+                    rms = fit.SplitFitGKRR(TestSet,Y,0.2)   #edit this line to change the method
                     setRMS.append(rms)
                 TestRMS.append(np.mean(setRMS))
                 print("Descr ",z,"",L[0][z]+" has rms",np.mean(setRMS))

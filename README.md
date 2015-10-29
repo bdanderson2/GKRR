@@ -1,4 +1,6 @@
 # GKRR
+USE GKRR V2 FOR MOST UP TO DATE CODE!
+
 Gaussian Kernel Ridge Regression Methods
 
 Labels (Consistent among all files)
